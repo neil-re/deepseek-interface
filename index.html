@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Query Interface</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin: 50px; }
+        input, button { font-size: 18px; padding: 10px; margin: 10px; width: 300px; }
+        #response { margin-top: 20px; white-space: pre-wrap; font-size: 16px; text-align: left; display: inline-block; max-width: 80%; }
+        #loading { display: none; font-size: 18px; color: blue; }
+    </style>
+</head>
+<body>
+    <h1>Ollama AI Query Interface</h1>
+    <input type="text" id="prompt" placeholder="Write your query here">
+    <button onclick="queryOllama()">Send</button>
+    <p id="loading">⌛ Waiting for response...</p>
+    <pre id="response"></pre>
+
+    <div style="margin-top: 30px;">
+        <p style="margin-bottom: 15px; color: #666;">If you find this tool useful, please consider visiting our YouTube channel and subscribing.</p>
+        <a href="https://youtube.com/@praderadigital?sub_confirmation=1" 
+           target="_blank"
+           style="text-decoration: none; 
+                  color: white; 
+                  background-color: #FF0000; 
+                  padding: 10px 20px; 
+                  border-radius: 5px; 
+                  font-weight: bold;">
+            Visit Pradera Digital on YouTube
+        </a>
+    </div>
+
+    <script>
+        async function queryOllama() {
+            const prompt = document.getElementById("prompt").value;
+            const responseElement = document.getElementById("response");
+            const loadingElement = document.getElementById("loading");
+
+            if (!prompt) {
+                responseElement.innerText = "⚠️ Please write something before sending.";
+                return;
+            }
+
+            responseElement.innerText = "";  
+            loadingElement.style.display = "block";
+
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 600000); // 10 min timeout
+
+                const response = await fetch("http://localhost:11434/api/generate", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        model: "deepseek-r1:14b",
+                        prompt: prompt,
+                        stream: false
+                    }),
+                    signal: controller.signal,
+                    keepalive: true
+                });
+
+                clearTimeout(timeoutId);
+
+                if (!response.ok) {
+                    throw new Error("Error in Ollama response");
+                }
+
+                const data = await response.json();
+                responseElement.innerText = data.response || "No response.";
+            } catch (error) {
+                if (error.name === "AbortError") {
+                    responseElement.innerText = "❌ Timeout reached.";
+                } else {
+                    responseElement.innerText = "❌ Error connecting to Ollama.";
+                }
+            } finally {
+                loadingElement.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>
