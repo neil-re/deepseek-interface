@@ -1,7 +1,7 @@
 # Web Interface for Ollama (with DeepSeek)
 
-A simple and effective web interface to interact with Ollama models, specifically configured to use DeepSeek.
-It includes the connectivity to local Ollama with the respective AI installed locally. It was developed to use with DeepSeek 14B parameteres, but you can change it as described below in the configuration section.
+A simple and effective web interface to interact with Ollama models, specifically configured to use DeepSeek.<br>
+It includes the connectivity to local Ollama with the respective AI installed locally. <br>It was developed to use with DeepSeek 14B parameteres, but you can change it as described below in the Configuration section. More details in the Features section<br> 
 Also includes a 10 min timeout, since local AI might infere slowly, generating error when trying to connect through API, so timeout solves this issue.
 
 ## 🚀 Prerequisites
